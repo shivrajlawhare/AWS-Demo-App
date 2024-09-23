@@ -7,5 +7,7 @@ export default defineConfig({
     proxy: {
       '/api': '16.170.245.26:5000', // Adjust if needed
     },
+    host: true,
+    port: 80,
   },
 });
