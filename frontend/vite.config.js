@@ -8,6 +8,6 @@ export default defineConfig({
       '/api': '16.170.245.26:5000', // Adjust if needed
     },
     host: true,
-    port: 80,
+    port: 5173,
   },
 });
