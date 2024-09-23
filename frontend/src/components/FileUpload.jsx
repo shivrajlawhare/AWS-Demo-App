@@ -15,8 +15,8 @@ const FileUpload = () => {
     formData.append('file', file);
 
     try {
-      // Use localhost for testing the backend locally
-      const response = await axios.post('16.170.245.26:5000/upload', formData, {
+      // Update the API endpoint to match the proxy path
+      const response = await axios.post('/api/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setFileUrl(response.data.fileUrl);
