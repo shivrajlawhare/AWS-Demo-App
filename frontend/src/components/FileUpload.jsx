@@ -16,7 +16,7 @@ const FileUpload = () => {
 
     try {
       // Use localhost for testing the backend locally
-      const response = await axios.post('http://localhost:5000/upload', formData, {
+      const response = await axios.post('16.170.245.26:5000/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setFileUrl(response.data.fileUrl);
