@@ -3,6 +3,7 @@ const cors = require('cors');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const { S3Client } = require('@aws-sdk/client-s3');
+const { DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -45,10 +46,24 @@ app.post('/upload', upload.array('files'), (req, res) => {
   res.send({ fileUrls });
 });
 
-// Route to delete a file (this is a placeholder, you would implement the actual deletion logic)
-app.delete('/delete/:fileKey', (req, res) => {
-  // Implement S3 delete logic here
-  res.send({ message: 'File deleted successfully!' });
+// Add this route to handle the delete request
+app.delete('/delete/:key', async (req, res) => {
+  const { key } = req.params; // Get the key from the URL parameters
+
+  try {
+    const deleteParams = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: key,
+    };
+
+    // Delete the object from S3
+    await s3.send(new DeleteObjectCommand(deleteParams));
+
+    res.status(200).send({ message: 'File deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    res.status(500).send({ error: 'Error deleting file.' });
+  }
 });
 
 const port = 5000;

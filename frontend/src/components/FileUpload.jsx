@@ -2,43 +2,34 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const FileUpload = () => {
-  const [files, setFiles] = useState([]);
-  const [fileUrls, setFileUrls] = useState([]);
-  const [uploadProgress, setUploadProgress] = useState([]);
+  const [file, setFile] = useState(null);
+  const [fileUrl, setFileUrl] = useState('');
+  const [files, setFiles] = useState([]); // Array to hold uploaded files
 
   const handleFileChange = (e) => {
-    setFiles([...e.target.files]);
+    setFile(e.target.files[0]);
   };
 
   const handleFileUpload = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    files.forEach(file => {
-      formData.append('files', file);
-    });
+    formData.append('file', file);
 
     try {
       const response = await axios.post('http://16.170.245.26:5000/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: (progressEvent) => {
-          const { loaded, total } = progressEvent;
-          const percent = Math.round((loaded * 100) / total);
-          setUploadProgress(percent);
-        },
       });
-
-      setFileUrls(response.data.fileUrls);
+      setFileUrl(response.data.fileUrl);
+      setFiles([...files, { url: response.data.fileUrl, key: response.data.key }]); // Add file details to the list
     } catch (error) {
-      console.error('Error uploading files:', error);
+      console.error('Error uploading file:', error);
     }
   };
 
-  const handleDelete = async (fileKey) => {
-    // Call the delete API to delete the file
+  const handleDelete = async (key) => {
     try {
-      await axios.delete(`http://16.170.245.26:5000/delete/${fileKey}`);
-      // Optionally, remove the deleted file URL from the fileUrls state
-      setFileUrls(prev => prev.filter(url => !url.includes(fileKey)));
+      await axios.delete(`http://16.170.245.26:5000/delete/${key}`);
+      setFiles(files.filter(file => file.key !== key)); // Remove the file from the list
     } catch (error) {
       console.error('Error deleting file:', error);
     }
@@ -46,25 +37,26 @@ const FileUpload = () => {
 
   return (
     <div>
-      <h1>Upload Files to S3</h1>
+      <h1>Upload File to S3</h1>
       <form onSubmit={handleFileUpload}>
-        <input type="file" multiple onChange={handleFileChange} />
+        <input type="file" onChange={handleFileChange} />
         <button type="submit">Upload</button>
       </form>
-      {uploadProgress > 0 && <div>Upload Progress: {uploadProgress}%</div>}
-      {fileUrls.length > 0 && (
+      {fileUrl && (
         <div>
-          <h2>Uploaded Files:</h2>
-          <ul>
-            {fileUrls.map((url, index) => (
-              <li key={index}>
-                <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>
-                <button onClick={() => handleDelete(url.split('/').pop())}>Delete</button>
-              </li>
-            ))}
-          </ul>
+          <h2>File uploaded successfully!</h2>
+          <p>File URL: <a href={fileUrl} target="_blank" rel="noopener noreferrer">{fileUrl}</a></p>
         </div>
       )}
+      <h2>Uploaded Files</h2>
+      <ul>
+        {files.map(file => (
+          <li key={file.key}>
+            <a href={file.url} target="_blank" rel="noopener noreferrer">{file.url}</a>
+            <button onClick={() => handleDelete(file.key)}>Delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
