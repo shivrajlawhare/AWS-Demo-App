@@ -16,7 +16,7 @@ const FileUpload = () => {
 
     try {
       // Update the API endpoint to match the proxy path
-      const response = await axios.post('/api/upload', formData, {
+      const response = await axios.post('http://16.170.245.26:5000/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setFileUrl(response.data.fileUrl);
