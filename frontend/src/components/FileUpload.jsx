@@ -13,7 +13,7 @@ const FileUpload = () => {
   const handleFileUpload = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('files', file);
 
     try {
       const response = await axios.post('http://16.170.245.26:5000/upload', formData, {
