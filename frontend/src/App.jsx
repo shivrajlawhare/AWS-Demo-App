@@ -3,7 +3,7 @@ import FileUpload from './components/FileUpload.jsx';
 
 function App() {
   return (
-    <div className='bg-gray-800'>
+    <div className='bg-gray-800 h-screen w-full'>
       <FileUpload />
     </div>
   );

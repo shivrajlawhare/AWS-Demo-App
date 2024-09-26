@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from "uuid";
 
-
 const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [fileUrl, setFileUrl] = useState('');
@@ -15,11 +14,16 @@ const FileUpload = () => {
 
   const fetchImages = async () => {
     try {
-      // const response = await axios.get('http://localhost:5000/images');
-      const response = await axios.get('16.170.245.26:5000/images');
-      setImages(response.data);
+      const response = await axios.get('http://16.170.245.26:5000/images');
+      if (response.data) {
+        setImages(response.data);
+      } else {
+        console.error('No images found');
+        setImages([]); // Set images to an empty array if no data is returned
+      }
     } catch (error) {
       console.error('Error fetching images:', error);
+      setImages([]); // Set images to an empty array if an error occurs
     }
   };
 
@@ -33,10 +37,7 @@ const FileUpload = () => {
     formData.append("files", file);
 
     try {
-      // const response = await axios.post("http://localhost:5000/upload", formData, {
-      //   headers: { "Content-Type": "multipart/form-data" },
-      // });
-      const response = await axios.post("16.170.245.26:5000/upload", formData, {
+      const response = await axios.post("http://16.170.245.26:5000/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -55,10 +56,7 @@ const FileUpload = () => {
 
   const handleDelete = async (name) => {
     try {
-      // await axios.delete("http://localhost:5000/delete", {
-      //   data: { name },
-      // });
-      await axios.delete("16.170.245.26:5000/delete", {
+      await axios.delete("http://16.170.245.26:5000/delete", {
         data: { name },
       });
       setFiles(files.filter((file) => file.name !== name));
@@ -80,18 +78,9 @@ const FileUpload = () => {
           <p>File URL: <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">{fileUrl}</a></p>
         </div>
       )}
-      {/* <h2>Uploaded Files</h2>
-      <ul>
-        {files.map(file => (
-          <li key={file.key} className="flex items-center py-2">
-            <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">{file.url}</a>
-            <button onClick={() => handleDelete(file.name)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2">Delete</button>
-          </li>
-        ))}
-      </ul> */}
       <h2 className='my-5 text-xl font-bold'>Files from S3 Bucket</h2>
       <div className="grid grid-cols-3 gap-4">
-        {images.map(image => (
+        {Array.isArray(images) && images.map(image => (
           <div key={image.key} className="flex flex-col items-center p-4 border border-gray-200 rounded">
             <img src={image.url} alt={image.key} className="w-full h-48 object-cover rounded-t" />
             <button onClick={() => handleDelete(image.key)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Delete</button>
