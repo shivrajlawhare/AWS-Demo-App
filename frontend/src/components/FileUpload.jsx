@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { v4 as uuidv4 } from "uuid";
+
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
@@ -13,25 +15,34 @@ const FileUpload = () => {
   const handleFileUpload = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append('files', file);
+    formData.append("files", file);
 
     try {
-      const response = await axios.post('http://16.170.245.26:5000/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const response = await axios.post("http://localhost:5000/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      setFileUrl(response.data.fileUrl);
-      setFiles([...files, { url: response.data.fileUrl, key: response.data.key }]); // Add file details to the list
+
+      const fullFileName = response.data.fileUrls[0].split('/').pop(); // Extract file name from URL
+      const newFile = {
+        url: response.data.fileUrls[0],
+        key: uuidv4(),
+        name: fullFileName,
+      };
+      setFiles([...files, newFile]);
+      setFileUrl(newFile.url);
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error("Error uploading file:", error);
     }
   };
 
-  const handleDelete = async (key) => {
+  const handleDelete = async (name) => {
     try {
-      await axios.delete(`http://16.170.245.26:5000/delete/${key}`);
-      setFiles(files.filter(file => file.key !== key)); // Remove the file from the list
+      await axios.delete("http://localhost:5000/delete", {
+        data: { name },
+      });
+      setFiles(files.filter((file) => file.name !== name));
     } catch (error) {
-      console.error('Error deleting file:', error);
+      console.error("Error deleting file:", error);
     }
   };
 
@@ -53,7 +64,7 @@ const FileUpload = () => {
         {files.map(file => (
           <li key={file.key}>
             <a href={file.url} target="_blank" rel="noopener noreferrer">{file.url}</a>
-            <button onClick={() => handleDelete(file.key)}>Delete</button>
+            <button onClick={() => handleDelete(file.name)}>Delete</button>
           </li>
         ))}
       </ul>

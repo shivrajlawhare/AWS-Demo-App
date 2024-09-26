@@ -9,6 +9,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
+app.use(express.json());
 
 // Enable CORS for all requests
 app.use(cors());
@@ -47,13 +48,13 @@ app.post('/upload', upload.array('files'), (req, res) => {
 });
 
 // Add this route to handle the delete request
-app.delete('/delete/:key', async (req, res) => {
-  const { key } = req.params; // Get the key from the URL parameters
+app.delete('/delete', async (req, res) => {
+  const { name } = req.body; // Get the key from the request body
 
   try {
     const deleteParams = {
       Bucket: process.env.BUCKET_NAME,
-      Key: key,
+      Key: name,
     };
 
     // Delete the object from S3
@@ -65,6 +66,7 @@ app.delete('/delete/:key', async (req, res) => {
     res.status(500).send({ error: 'Error deleting file.' });
   }
 });
+
 
 const port = 5000;
 app.listen(port, () => {
