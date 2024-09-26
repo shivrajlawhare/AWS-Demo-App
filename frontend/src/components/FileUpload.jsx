@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from "uuid";
 
@@ -7,6 +7,20 @@ const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [fileUrl, setFileUrl] = useState('');
   const [files, setFiles] = useState([]); // Array to hold uploaded files
+  const [images, setImages] = useState([]); // Array to hold uploaded files
+
+  useEffect(() => {
+    fetchImages();
+  }, [files,images]);
+
+  const fetchImages = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/images');
+      setImages(response.data);
+    } catch (error) {
+      console.error('Error fetching images:', error);
+    }
+  };
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -47,27 +61,36 @@ const FileUpload = () => {
   };
 
   return (
-    <div>
-      <h1>Upload File to S3</h1>
-      <form onSubmit={handleFileUpload}>
-        <input type="file" onChange={handleFileChange} />
-        <button type="submit">Upload</button>
+    <div className='flex justify-center items-center flex-col  text-slate-200'>
+      <h1 className='font-bold size-14 w-auto mt-12 mb-10 text-3xl m-auto py-4'>Upload File to S3</h1>
+      <form onSubmit={handleFileUpload} className='flex justify-center items-center flex-col gap-y-2'>
+        <input type="file" className='border border-black' onChange={handleFileChange} />
+        <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold my-5 py-2 px-4 rounded">Upload</button>
       </form>
       {fileUrl && (
-        <div>
+        <div className='my-5'>
           <h2>File uploaded successfully!</h2>
-          <p>File URL: <a href={fileUrl} target="_blank" rel="noopener noreferrer">{fileUrl}</a></p>
+          <p>File URL: <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">{fileUrl}</a></p>
         </div>
       )}
-      <h2>Uploaded Files</h2>
+      {/* <h2>Uploaded Files</h2>
       <ul>
         {files.map(file => (
-          <li key={file.key}>
-            <a href={file.url} target="_blank" rel="noopener noreferrer">{file.url}</a>
-            <button onClick={() => handleDelete(file.name)}>Delete</button>
+          <li key={file.key} className="flex items-center py-2">
+            <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">{file.url}</a>
+            <button onClick={() => handleDelete(file.name)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2">Delete</button>
           </li>
         ))}
-      </ul>
+      </ul> */}
+      <h2 className='my-5 text-xl font-bold'>Files from S3 Bucket</h2>
+      <div className="grid grid-cols-3 gap-4">
+        {images.map(image => (
+          <div key={image.key} className="flex flex-col items-center p-4 border border-gray-200 rounded">
+            <img src={image.url} alt={image.key} className="w-full h-48 object-cover rounded-t" />
+            <button onClick={() => handleDelete(image.key)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">Delete</button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
