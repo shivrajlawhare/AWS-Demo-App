@@ -15,7 +15,8 @@ const FileUpload = () => {
 
   const fetchImages = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/images');
+      // const response = await axios.get('http://localhost:5000/images');
+      const response = await axios.get('16.170.245.26:5000/images');
       setImages(response.data);
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -32,7 +33,10 @@ const FileUpload = () => {
     formData.append("files", file);
 
     try {
-      const response = await axios.post("http://localhost:5000/upload", formData, {
+      // const response = await axios.post("http://localhost:5000/upload", formData, {
+      //   headers: { "Content-Type": "multipart/form-data" },
+      // });
+      const response = await axios.post("16.170.245.26:5000/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -51,7 +55,10 @@ const FileUpload = () => {
 
   const handleDelete = async (name) => {
     try {
-      await axios.delete("http://localhost:5000/delete", {
+      // await axios.delete("http://localhost:5000/delete", {
+      //   data: { name },
+      // });
+      await axios.delete("16.170.245.26:5000/delete", {
         data: { name },
       });
       setFiles(files.filter((file) => file.name !== name));
