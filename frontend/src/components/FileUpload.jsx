@@ -14,7 +14,7 @@ const FileUpload = () => {
 
   const fetchImages = async () => {
     try {
-      const response = await axios.get('http://16.170.245.26:5000/images');
+      const response = await axios.get('http://13.60.42.69:5000/images');
       if (response.data) {
         setImages(response.data);
       } else {
@@ -37,7 +37,7 @@ const FileUpload = () => {
     formData.append("files", file);
 
     try {
-      const response = await axios.post("http://16.170.245.26:5000/upload", formData, {
+      const response = await axios.post("http://13.60.42.69:5000/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -56,7 +56,7 @@ const FileUpload = () => {
 
   const handleDelete = async (name) => {
     try {
-      await axios.delete("http://16.170.245.26:5000/delete", {
+      await axios.delete("http://13.60.42.69:5000/delete", {
         data: { name },
       });
       setFiles(files.filter((file) => file.name !== name));
